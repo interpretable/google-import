@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "fast-csv": "^4.3.6",
+    "fuzzysort": "^2.0.3",
+    "google-auth-library": "^8.7.0",
+    "googleapis": "^109.0.1",
+    "jsonfile": "^6.1.0"
+  }
+}

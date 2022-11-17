@@ -102,3 +102,9 @@ dist
 
 # TernJS port file
 .tern-port
+
+# csv import
+Liste pictogrammes - Membres du comité éditorial - Pictos.csv
+Liste pictogrammes - Membres du comité éditorial - Grilles.csv
+images/*
+export/

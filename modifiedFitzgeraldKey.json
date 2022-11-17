@@ -1,0 +1,52 @@
+[
+  {
+    "category": "NOUN",
+    "fontColor": "#000000",
+    "backgroundColor": "#ffb33f"
+  },
+  {
+    "category": "Pronoun",
+    "fontColor": "#000000",
+    "backgroundColor": "#ffe682"
+  },
+  {
+    "category": "VERB",
+    "fontColor": "#000000",
+    "backgroundColor": "#9ee281"
+  },
+  {
+    "category": "ADJECTIVE",
+    "fontColor": "#000000",
+    "backgroundColor": "#69c8ff"
+  },
+  {
+    "category": "PREPOSITION or SOCIAL WORDS",
+    "fontColor": "#ff8cd2",
+    "backgroundColor": "#69c8ff"
+  },
+  {
+    "category": "QUESTION",
+    "fontColor": "#000000",
+    "backgroundColor": "#a87dff"
+  },
+  {
+    "category": "NEGATION or IMPORTANT WORD",
+    "fontColor": "#000000",
+    "backgroundColor": "#ff5050"
+  },
+  {
+    "category": "ADVERB",
+    "fontColor": "#000000",
+    "backgroundColor": "#c19a84"
+  },
+  {
+    "category": "CONJUNCTION",
+    "fontColor": "#000000",
+    "backgroundColor": "#ffffff"
+  },
+  {
+    "category": "DETERMINER",
+    "fontColor": "#ffffff",
+    "backgroundColor": "#464646"
+  }
+]
