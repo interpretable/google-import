@@ -8,12 +8,12 @@ const fuzzysort = require('fuzzysort');
 
 const buildSearchTargetsFromPath = async directoryPath => {
   const files = await fsPromises.readdir(directoryPath);
-  return (
-    files
-      .map(file => ({ file, name: path.parse(file).name }))
-      // .filter(t => t.file.length < 1000)
-      .map(({ file }) => fuzzysort.prepare(file))
-  );
+  return files.map(file => ({
+    file,
+    name: path.parse(file).name.replaceAll('_', ' ')
+  }));
+  // .filter(t => t.file.length < 1000)
+  // .map(({ file }) => fuzzysort.prepare(file))
 };
 
 const transformBoardRow = row => {
@@ -48,16 +48,17 @@ const transformPictoRow = (targets, options) => (row, next) => {
 
   // console.log(Object.keys(row));
   const label = row['Label*\n(Apparaitra sous le picto dans CBoard)'];
-  const results = fuzzysort.go(label, targets, options);
+  console.log('label', label.toLowerCase());
+  const results = fuzzysort.go(label.toLowerCase().replaceAll('-', ' '), targets, { key: 'name' });
   if (results.length === 0) {
     next(null, null);
     return;
   }
-  console.log(results.length);
-  console.log(results.map(result => result.target));
+  console.log(results.map(result => result.obj.file));
 
-  const image = path.resolve(cboardImagesDirectory, results[0].target);
-  fs.cp(path.resolve(imagesPath, results[0].target), image, e => {
+  const filename = results[0].obj.file;
+  const image = path.resolve(cboardImagesDirectory, filename);
+  fs.cp(path.resolve(imagesPath, filename), image, e => {
     if (e) {
       next(e);
     }
@@ -67,8 +68,9 @@ const transformPictoRow = (targets, options) => (row, next) => {
       loadBoard: row["Lors d'un clic ouvre la grille"] || null,
       row: row['Ligne'] || null,
       column: row['Colonne'] || null,
-      labelKey: label,
-      image,
+      id: label,
+      label,
+      image: `/${cboardSymbolsDirectory}${filename}`,
 
       ...getColorPropertiesFromGrammaticalCategory(
         row['Grammatical category / parts of speech']
@@ -119,13 +121,14 @@ const cboardJsonFileDirectory = path.resolve(
 );
 const cboardJsonFilePath = path.resolve(cboardJsonFileDirectory, 'boards.json');
 const imagesPath = path.resolve(__dirname, '..', 'images', 'Octobre-22');
+
+const cboardSymbolsDirectory = 'symbols/interpretable/';
 const cboardImagesDirectory = path.resolve(
   __dirname,
   '..',
   'export',
   'public',
-  'symbols',
-  'interpretable'
+  cboardSymbolsDirectory
 );
 
 (async () => {
@@ -134,8 +137,8 @@ const cboardImagesDirectory = path.resolve(
     advanced: []
   };
   const searchOptions = {
-    limit: 100, // don't return more results than you need!
-    threshold: -10000 // don't return bad results
+    limit: 100 // don't return more results than you need!
+    // threshold: -10000 // don't return bad results
   };
   const searchTargets = await buildSearchTargetsFromPath(imagesPath);
   await fsPromises.mkdir(cboardImagesDirectory, { recursive: true });
@@ -156,7 +159,7 @@ const cboardImagesDirectory = path.resolve(
         // .pipe(process.stdout)
         .on('data', picto => {
           const boardIndex = cboard.advanced.findIndex(
-            ({ name }) => picto.board
+            ({ name }) => name.toLowerCase() === picto.board.toLowerCase()
           );
           if (boardIndex !== -1) {
             cboard.advanced[boardIndex].tiles.push(transformPictoToTile(picto));
