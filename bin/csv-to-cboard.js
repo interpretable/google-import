@@ -26,12 +26,7 @@ const cboardJsonFileDirectory = path.resolve(
   'api'
 );
 const cboardJsonFilePath = path.resolve(cboardJsonFileDirectory, 'boards.json');
-const imagesPath = path.resolve(
-  __dirname,
-  '..',
-  'images',
-  'Octobre-22'
-);
+const imagesPath = path.resolve(__dirname, '..', 'images');
 
 const cboardSymbolsDirectory = 'symbols/interpretable/';
 const cboardImagesDirectory = path.resolve(
