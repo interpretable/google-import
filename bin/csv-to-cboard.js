@@ -5,6 +5,44 @@ const csv = require('fast-csv');
 const modifiedFitzgeraldKeys = require('../modifiedFitzgeraldKey.json');
 const jsonfile = require('jsonfile');
 const fuzzysort = require('fuzzysort');
+const simovSlugify = require('slugify');
+simovSlugify.extend({ "'": ' ', '/': ' ' });
+
+const pathToBoardsSheet = path.resolve(
+  __dirname,
+  '..',
+  'Interpretable - Donnees pictogrammes - Grilles.csv'
+);
+const pathToTilesSheet = path.resolve(
+  __dirname,
+  '..',
+  'Interpretable - Donnees pictogrammes - Pictos.csv'
+);
+const cboardJsonFileDirectory = path.resolve(
+  __dirname,
+  '..',
+  'export',
+  'src',
+  'api'
+);
+const cboardJsonFilePath = path.resolve(cboardJsonFileDirectory, 'boards.json');
+const imagesPath = path.resolve(
+  __dirname,
+  '..',
+  'images',
+  'Octobre-22'
+);
+
+const cboardSymbolsDirectory = 'symbols/interpretable/';
+const cboardImagesDirectory = path.resolve(
+  __dirname,
+  '..',
+  'export',
+  'public',
+  cboardSymbolsDirectory
+);
+const backgroundColor = 'rgb(255, 255, 255)';
+const folderBackgroundColor = 'rgb(187, 222, 251)';
 
 const buildSearchTargetsFromPath = async directoryPath => {
   const files = await fsPromises.readdir(directoryPath);
@@ -16,6 +54,12 @@ const buildSearchTargetsFromPath = async directoryPath => {
   // .map(({ file }) => fuzzysort.prepare(file))
 };
 
+const slugify = string => simovSlugify(string, { strict: true, lower: true });
+
+const transformPictoToTile = picto => ({
+  ...picto
+});
+
 const transformBoardRow = row => {
   // Grilles
   // Nombre de ligne
@@ -23,7 +67,7 @@ const transformBoardRow = row => {
   const label = row['Grilles'];
 
   return {
-    id: label,
+    id: slugify(label),
     name: label,
     nameKey: label,
     author: 'Interpretable',
@@ -48,37 +92,40 @@ const transformPictoRow = (targets, options) => (row, next) => {
 
   // console.log(Object.keys(row));
   const label = row['Label*\n(Apparaitra sous le picto dans CBoard)'];
-  console.log('label', label.toLowerCase());
-  const results = fuzzysort.go(label.toLowerCase().replaceAll('-', ' '), targets, { key: 'name' });
-  if (results.length === 0) {
+  if (!label) {
     next(null, null);
     return;
   }
-  console.log(results.map(result => result.obj.file));
 
-  const filename = results[0].obj.file;
-  const image = path.resolve(cboardImagesDirectory, filename);
-  fs.cp(path.resolve(imagesPath, filename), image, e => {
-    if (e) {
-      next(e);
-    }
+  const normalizedLabel = label.toLowerCase().replaceAll('-', ' ');
+  const loadBoard = row["Lors d'un clic ouvre la grille"];
+  const id = `${slugify(board)}_${slugify(label)}`;
+  console.log('id', id);
+  transformedRow = {
+    board: slugify(board),
+    loadBoard: loadBoard ? slugify(loadBoard) : null,
+    row: row['Ligne'] || null,
+    column: row['Colonne'] || null,
+    id,
+    label,
+    backgroundColor: loadBoard ? folderBackgroundColor : backgroundColor
+  };
 
-    transformedRow = {
-      board,
-      loadBoard: row["Lors d'un clic ouvre la grille"] || null,
-      row: row['Ligne'] || null,
-      column: row['Colonne'] || null,
-      id: label,
-      label,
-      image: `/${cboardSymbolsDirectory}${filename}`,
-
-      ...getColorPropertiesFromGrammaticalCategory(
-        row['Grammatical category / parts of speech']
-      )
-    };
-
+  const results = fuzzysort.go(normalizedLabel, targets, { key: 'name' });
+  if (results.length > 0) {
+    console.log(results.map(result => result.obj.file));
+    const filename = results[0].obj.file;
+    const image = path.resolve(cboardImagesDirectory, filename);
+    fs.cp(path.resolve(imagesPath, filename), image, e => {
+      if (e) {
+        next(e);
+      }
+      transformedRow.image = `/${cboardSymbolsDirectory}${filename}`;
+      next(null, transformedRow);
+    });
+  } else {
     next(null, transformedRow);
-  });
+  }
 };
 
 const getColorPropertiesFromGrammaticalCategory = grammaticalCateory => {
@@ -95,41 +142,8 @@ const getColorPropertiesFromGrammaticalCategory = grammaticalCateory => {
     }
   }
 
-  return { fontColor: '#000000', backgroundColor: '#FFFFFF' };
+  return { fontColor: '#000000', backgroundColor };
 };
-
-const transformPictoToTile = picto => ({
-  ...picto
-});
-
-const pathToBoardsSheet = path.resolve(
-  __dirname,
-  '..',
-  'Liste pictogrammes - Membres du comité éditorial - Grilles.csv'
-);
-const pathToTilesSheet = path.resolve(
-  __dirname,
-  '..',
-  'Liste pictogrammes - Membres du comité éditorial - Pictos.csv'
-);
-const cboardJsonFileDirectory = path.resolve(
-  __dirname,
-  '..',
-  'export',
-  'src',
-  'api'
-);
-const cboardJsonFilePath = path.resolve(cboardJsonFileDirectory, 'boards.json');
-const imagesPath = path.resolve(__dirname, '..', 'images', 'Octobre-22');
-
-const cboardSymbolsDirectory = 'symbols/interpretable/';
-const cboardImagesDirectory = path.resolve(
-  __dirname,
-  '..',
-  'export',
-  'public',
-  cboardSymbolsDirectory
-);
 
 (async () => {
   let cboard = {
