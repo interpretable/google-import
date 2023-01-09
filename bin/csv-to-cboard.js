@@ -26,6 +26,10 @@ const cboardJsonFileDirectory = path.resolve(
   'api'
 );
 const cboardJsonFilePath = path.resolve(cboardJsonFileDirectory, 'boards.json');
+const symbolsJsonFilePath = path.resolve(
+  cboardJsonFileDirectory,
+  'interpretable-symbols.json'
+);
 const imagesPath = path.resolve(__dirname, '..', 'images');
 
 const cboardSymbolsDirectory = 'symbols/interpretable/';
@@ -43,13 +47,20 @@ const buildSearchTargetsFromPath = async directoryPath => {
   const files = await fsPromises.readdir(directoryPath);
   return files.map(file => ({
     file,
-    name: path.parse(file).name.replaceAll('_', ' ')
+    humanizedName: humanize(path.parse(file).name),
+    name: slugify(humanize(path.parse(file).name), '_')
   }));
   // .filter(t => t.file.length < 1000)
   // .map(({ file }) => fuzzysort.prepare(file))
 };
 
-const slugify = string => simovSlugify(string, { strict: true, lower: true });
+const humanize = string =>
+  string
+    .replaceAll('Base_interpretable_V17_', '')
+    .replaceAll('_', ' ')
+    .replaceAll('-', ' ');
+const slugify = (string, replacement = '-') =>
+  simovSlugify(string, { strict: true, lower: true, replacement });
 
 const transformPictoToTile = picto => ({
   ...picto
@@ -75,10 +86,11 @@ const transformBoardRow = row => {
 
 const transformPictoRow = (targets, options) => (row, next) => {
   let transformedRow = null;
-
-  const renamed =
-    row['Fichiers png renommés dans drive'].toLowerCase() === 'oui';
   const board = row['Est présent sur la grille'];
+  const description = row['Descriptif'];
+  const userInputFilename = row['Nom du fichier image']
+    ? slugify(humanize(row['Nom du fichier image']), '_')
+    : null;
   const hasBoard = !!board;
   if (!hasBoard) {
     next(null, null);
@@ -88,6 +100,7 @@ const transformPictoRow = (targets, options) => (row, next) => {
   // console.log(Object.keys(row));
   const label = row['Label*\n(Apparaitra sous le picto dans CBoard)'];
   if (!label) {
+    console.warn(`Pictogram described as "${description}" has no label.`);
     next(null, null);
     return;
   }
@@ -106,21 +119,48 @@ const transformPictoRow = (targets, options) => (row, next) => {
     backgroundColor: loadBoard ? folderBackgroundColor : backgroundColor
   };
 
-  const results = fuzzysort.go(normalizedLabel, targets, { key: 'name' });
-  if (results.length > 0) {
-    console.log(results.map(result => result.obj.file));
-    const filename = results[0].obj.file;
-    const image = path.resolve(cboardImagesDirectory, filename);
-    fs.cp(path.resolve(imagesPath, filename), image, e => {
-      if (e) {
-        next(e);
-      }
-      transformedRow.image = `/${cboardSymbolsDirectory}${filename}`;
-      next(null, transformedRow);
-    });
+  console.log('  filenameSearchInput', userInputFilename);
+  const results = fuzzysort.go(userInputFilename, targets, { key: 'name' });
+  if (userInputFilename && results.length > 0) {
+    console.log(
+      '  filenameFirstResult',
+      results.map(result => result.obj.file).slice(0, 2)
+    );
+    handleFileResult(results[0].obj.file, transformedRow, next);
   } else {
-    next(null, transformedRow);
+    const results = fuzzysort.go(normalizedLabel, targets, {
+      key: 'humanizedName'
+    });
+    if (results.length > 0) {
+      console.log('  guessInput', normalizedLabel);
+      console.log(
+        '  guessFirstResult',
+        results.map(result => result.obj.file).slice(0, 2)
+      );
+      handleFileResult(results[0].obj.file, transformedRow, next);
+    } else {
+      next(null, transformedRow);
+    }
   }
+
+  console.log('why how ?');
+  // next(null, transformedRow);
+};
+
+const handleFileResult = (filename, transformedRow, nextCallback) => {
+  const definitiveFilename = `${slugify(transformedRow.label, '_')}.svg`;
+  const definitiveFilePath = path.resolve(
+    cboardImagesDirectory,
+    definitiveFilename
+  );
+  fs.cp(path.resolve(imagesPath, filename), definitiveFilePath, e => {
+    if (e) {
+      nextCallback(e);
+    }
+    console.log('image', `/${cboardSymbolsDirectory}${definitiveFilename}`);
+    transformedRow.image = `/${cboardSymbolsDirectory}${definitiveFilename}`;
+    nextCallback(null, transformedRow);
+  });
 };
 
 const getColorPropertiesFromGrammaticalCategory = grammaticalCateory => {
@@ -145,6 +185,7 @@ const getColorPropertiesFromGrammaticalCategory = grammaticalCateory => {
     beginner: [],
     advanced: []
   };
+  let symbols = [];
   const searchOptions = {
     limit: 100 // don't return more results than you need!
     // threshold: -10000 // don't return bad results
@@ -171,7 +212,27 @@ const getColorPropertiesFromGrammaticalCategory = grammaticalCateory => {
             ({ name }) => name.toLowerCase() === picto.board.toLowerCase()
           );
           if (boardIndex !== -1) {
-            cboard.advanced[boardIndex].tiles.push(transformPictoToTile(picto));
+            const pictoIndex = cboard.advanced[boardIndex].tiles.findIndex(
+              ({ id }) => id === picto.id
+            );
+            if (pictoIndex === -1) {
+              cboard.advanced[boardIndex].tiles.push(
+                transformPictoToTile(picto)
+              );
+            }
+          }
+
+          // symbols
+          const id = `symbol.intepretable.${toCamelCase(picto.label)}`;
+          const symbolIndex = symbols.findIndex(
+            ({ id: symbolId }) => symbolId === id
+          );
+          if (symbolIndex === -1) {
+            symbols.push({
+              id,
+              translatedId: picto.label,
+              src: picto.image ? picto.image : null
+            });
           }
         })
         .on('end', () => {
@@ -179,11 +240,39 @@ const getColorPropertiesFromGrammaticalCategory = grammaticalCateory => {
             if (err) {
               console.error(err);
             }
-            process.exit();
+
+            // symbols
+            symbols = symbols.filter(
+              ({ translatedId, src }) => translatedId && src
+            );
+            jsonfile.writeFile(
+              symbolsJsonFilePath,
+              symbols,
+              { spaces: 2 },
+              e => {
+                if (e) {
+                  console.error(e);
+                }
+
+                process.exit();
+              }
+            );
           });
         });
     });
 })();
+
+const toCamelCase = string => {
+  return slugify(string)
+    .split('_')
+    .map((str, i) => {
+      if (i === 0) {
+        return str;
+      }
+      return str.charAt(0).toUpperCase() + str.slice(1);
+    })
+    .join('');
+};
 
 /**
  * Downloads a file
