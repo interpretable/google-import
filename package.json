@@ -10,6 +10,45 @@
   },
   "scripts": {
     "csv-to-cboard": "node bin/csv-to-cboard.js",
-    "svgo": "svgo -f ./images"
+    "svgo": "svgo -f ./images",
+    "svgo-export": "svgo -f ./export/public/symbols/interpretable",
+    "clean": "rm -rf ./export/"
   }
 }
+deleted:    public/symbols/interpretable/afrique.svg
+deleted:    public/symbols/interpretable/araignee.svg
+deleted:    public/symbols/interpretable/bateau.svg
+deleted:    public/symbols/interpretable/bebe_dort.svg
+deleted:    public/symbols/interpretable/boite_aux_lettres.svg
+deleted:    public/symbols/interpretable/console_de_jeux_portable.svg
+deleted:    public/symbols/interpretable/dent_cassee.svg
+deleted:    public/symbols/interpretable/dosage_medicament.svg
+deleted:    public/symbols/interpretable/evier.svg
+deleted:    public/symbols/interpretable/fauteuil_roulant_electrique.svg
+deleted:    public/symbols/interpretable/fenetre_ouverte.svg
+deleted:    public/symbols/interpretable/guepe.svg
+deleted:    public/symbols/interpretable/humidite.svg
+deleted:    public/symbols/interpretable/infirmiere.svg
+deleted:    public/symbols/interpretable/logement_encombre.svg
+deleted:    public/symbols/interpretable/maison_de_la_metropole.svg
+deleted:    public/symbols/interpretable/medicament_levure.svg
+deleted:    public/symbols/interpretable/medicament_soluble.svg
+deleted:    public/symbols/interpretable/menopause.svg
+deleted:    public/symbols/interpretable/metier_intellectuel.svg
+deleted:    public/symbols/interpretable/metier_manuel.svg
+deleted:    public/symbols/interpretable/metro.svg
+deleted:    public/symbols/interpretable/porter_a_la_bouche.svg
+deleted:    public/symbols/interpretable/preservatif.svg
+deleted:    public/symbols/interpretable/proprietaire.svg
+deleted:    public/symbols/interpretable/regles_douloureuses.svg
+deleted:    public/symbols/interpretable/reseaux_sociaux.svg
+deleted:    public/symbols/interpretable/reveil.svg
+deleted:    public/symbols/interpretable/scolarite.svg
+deleted:    public/symbols/interpretable/serum_physiologique.svg
+deleted:    public/symbols/interpretable/serviette_hygienique.svg
+deleted:    public/symbols/interpretable/sirop_medicament.svg
+deleted:    public/symbols/interpretable/sterilet.svg
+deleted:    public/symbols/interpretable/tablette_numerique.svg
+deleted:    public/symbols/interpretable/tetine.svg
+deleted:    public/symbols/interpretable/trottinette.svg
+deleted:    public/symbols/interpretable/velo.svg

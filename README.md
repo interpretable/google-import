@@ -17,7 +17,7 @@ And extract it to the `images` directory.
 
 4. Run the script
 ```
-node bin/csv-to-cboard.js
+npm run csv-to-cboard
 ```
 
 ## Resources 
