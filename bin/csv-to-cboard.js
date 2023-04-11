@@ -86,7 +86,7 @@ const transformBoardRow = row => {
 
 const transformPictoRow = (targets, options) => (row, next) => {
   let transformedRow = null;
-  const board = row['Est présent sur la grille'];
+  const board = row['Est présent sur la grille '];
   const description = row['Descriptif'];
   const userInputFilename = row['Nom du fichier image']
     ? slugify(humanize(row['Nom du fichier image']), '_')
@@ -116,13 +116,14 @@ const transformPictoRow = (targets, options) => (row, next) => {
     column: row['Colonne'] || null,
     id,
     label,
+    loadBoardLabel: loadBoard,
     backgroundColor: loadBoard ? folderBackgroundColor : backgroundColor
   };
 
-  console.log('  filenameSearchInput', userInputFilename);
+  console.debug('  filenameSearchInput', userInputFilename);
   const results = fuzzysort.go(userInputFilename, targets, { key: 'name' });
   if (userInputFilename && results.length > 0) {
-    console.log(
+    console.debug(
       '  filenameFirstResult',
       results.map(result => result.obj.file).slice(0, 2)
     );
@@ -132,8 +133,8 @@ const transformPictoRow = (targets, options) => (row, next) => {
       key: 'humanizedName'
     });
     if (results.length > 0) {
-      console.log('  guessInput', normalizedLabel);
-      console.log(
+      console.debug('  guessInput', normalizedLabel);
+      console.debug(
         '  guessFirstResult',
         results.map(result => result.obj.file).slice(0, 2)
       );
@@ -143,7 +144,7 @@ const transformPictoRow = (targets, options) => (row, next) => {
     }
   }
 
-  console.log('why how ?');
+  console.debug('why how ?');
   // next(null, transformedRow);
 };
 
@@ -157,8 +158,9 @@ const handleFileResult = (filename, transformedRow, nextCallback) => {
     if (e) {
       nextCallback(e);
     }
-    console.log('image', `/${cboardSymbolsDirectory}${definitiveFilename}`);
+
     transformedRow.image = `/${cboardSymbolsDirectory}${definitiveFilename}`;
+    console.debug('image', transformedRow.image);
     nextCallback(null, transformedRow);
   });
 };
@@ -202,14 +204,13 @@ const getColorPropertiesFromGrammaticalCategory = grammaticalCateory => {
       cboard = { ...cboard, advanced: [...cboard.advanced, board] };
     })
     .on('end', () => {
-      // console.log('cboard', cboard);
       fs.createReadStream(pathToTilesSheet)
         .pipe(csv.parse({ headers: true }))
         .transform(transformPictoRow(searchTargets, searchOptions))
         // .pipe(process.stdout)
         .on('data', picto => {
           const boardIndex = cboard.advanced.findIndex(
-            ({ name }) => name.toLowerCase() === picto.board.toLowerCase()
+            ({ id }) => id === picto.board
           );
           if (boardIndex !== -1) {
             const pictoIndex = cboard.advanced[boardIndex].tiles.findIndex(
@@ -220,6 +221,14 @@ const getColorPropertiesFromGrammaticalCategory = grammaticalCateory => {
                 transformPictoToTile(picto)
               );
             }
+          } else {
+            console.warn(
+              `Couldn't find a board named ${
+                picto.board
+              }. Available board names are: ${cboard.advanced
+                .map(board => board.id)
+                .join(', ')}.`
+            );
           }
 
           // symbols
