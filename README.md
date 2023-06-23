@@ -63,6 +63,7 @@ npm run csv-to-cboard
 - [ ] Dans le board "Acteurs" apparaissent les cases
   - [x] "Centre social",
   - [ ] "Infirmière", _Je vois "infirmier" & "infirmier 2" c'est de ça dont tu parles ?_
+  > *JG C'est corrigé, j'ai changé le label du picto 2*
   - [x] "Bus info santé" sans les pictos (ces pictos n'existent pas normalement).
 - [ ] Il y a un board "Besoin" à la racine qui me convient bien, mais dont le picto qui le représente n'apparaît pas dans le google sheet. 
 > *Je ne vois pas cette board dans le dernier import...*
@@ -75,30 +76,42 @@ npm run csv-to-cboard
 
 ### Remarques
 
+
 - Board "Allergie" (la baord est vide)
 > *C'est corrigé, j'ai passé les pictos allérgies à l'intérieur de cette board.*
 
 #### Image manquantes
+> *JG : attention, les corrections ont été faîtes dans l'onglet "Pictos avec rubriques"*
 
 - Board "Racine"
   - "Métropole de Lyon"
+> *JG il existe pourtant bien un picto metropole_de_lyon*
   - Board "Acteurs"
     - "Securité sociale"
+> *JG 23/6 en cours de récupération*
   - Board "Emotions"
     - "Angoisse"
+> *JG corrigé*
   - Board "Handicap"
     - "Handicap en fauteuil"
+> *JG il existe pourtant bien un picto handicap_physique_fauteuil*
   - Board "Santé"
     - Board "Hygiène"
       - "Douche adulte"
+> *JG corrigé*
       - "Se laver au lavabo"
+> *JG 23/6 en cours de récupération*
     - "En cas de canicule"
+> *JG 23/6 en cours de récupération*
   - Board "Habitat"
     - "Habite à l'hôtel"
+> *JG 23/6 en cours de récupération*
   - Board "Enfant / bébé"
     - "Eteindre la lumière"
+> *JG corrigé*
   - Board "Famille"
     - "Nombre de bébés"
+> *JG corrigé, j'ai supprimé la ligne*
 
 ## Resources
 
