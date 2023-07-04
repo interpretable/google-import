@@ -65,7 +65,7 @@ npm run csv-to-cboard
   - [ ] "Infirmière", _Je vois "infirmier" & "infirmier 2" c'est de ça dont tu parles ?_
   > *JG C'est corrigé, j'ai changé le label du picto 2*
   - [x] "Bus info santé" sans les pictos (ces pictos n'existent pas normalement).
-- [ ] Il y a un board "Besoin" à la racine qui me convient bien, mais dont le picto qui le représente n'apparaît pas dans le google sheet. 
+- [x] Il y a un board "Besoin" à la racine qui me convient bien, mais dont le picto qui le représente n'apparaît pas dans le google sheet. 
 > *Je ne vois pas cette board dans le dernier import...*
 - [x] Dans le board "handicap" :
   - [x] le picto "Handicap en fauteuil" (actuellement avec le label "Handicap psychique Fauteuil" - modifié - qui pointe vers le picto handicap_physique_fauteuil) n'apparaît pas ;
@@ -79,6 +79,7 @@ npm run csv-to-cboard
 
 - Board "Allergie" (la baord est vide)
 > *C'est corrigé, j'ai passé les pictos allérgies à l'intérieur de cette board.*
+> A vérifier si modification présent dans "picctos avec rubriques"
 
 #### Image manquantes
 > *JG : attention, les corrections ont été faîtes dans l'onglet "Pictos avec rubriques"*
