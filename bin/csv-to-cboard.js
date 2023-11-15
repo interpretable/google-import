@@ -87,15 +87,13 @@ const transformBoardRow = row => {
 const transformPictoRow = (targets, options) => (row, next) => {
   let transformedRow = null;
   const board = row['Est présent sur la grille '];
-  const description = row['Descriptif'];
   const userInputFilename = row['Nom du fichier image']
     ? slugify(humanize(row['Nom du fichier image']), '_')
     : null;
 
   const label = row['Label*\n(Apparaitra sous le picto dans CBoard)'];
   if (!label) {
-    console.log(Object.keys(row));
-    console.warn(`Pictogram described as "${description}" has no label.`);
+    console.warn(`Pictogram with filename "${userInputFilename}" has no label.`);
     next(null, null);
     return;
   }
