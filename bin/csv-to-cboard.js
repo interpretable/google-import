@@ -91,7 +91,7 @@ const transformPictoRow = (targets, options) => (row, next) => {
     ? slugify(humanize(row['Nom du fichier image']), '_')
     : null;
 
-  const label = row['Label*\n(Apparaitra sous le picto dans CBoard)'];
+  const label = row['Label*\r\n(Apparaitra sous le picto dans CBoard)'];
   if (!label) {
     console.warn(`Pictogram with filename "${userInputFilename}" has no label.`);
     next(null, null);
