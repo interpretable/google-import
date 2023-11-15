@@ -16,7 +16,7 @@ const pathToBoardsSheet = path.resolve(
 const pathToTilesSheet = path.resolve(
   __dirname,
   '..',
-  'Interpretable - Donnees pictogrammes - Pictos.csv'
+  'Interpretable - Donnees pictogrammes - Pictos avec rubriques.csv'
 );
 const cboardJsonFileDirectory = path.resolve(
   __dirname,
@@ -92,8 +92,9 @@ const transformPictoRow = (targets, options) => (row, next) => {
     ? slugify(humanize(row['Nom du fichier image']), '_')
     : null;
 
-  const label = row['Label*\r\n(Apparaitra sous le picto dans CBoard)'];
+  const label = row['Label*\n(Apparaitra sous le picto dans CBoard)'];
   if (!label) {
+    console.log(Object.keys(row));
     console.warn(`Pictogram described as "${description}" has no label.`);
     next(null, null);
     return;
@@ -141,6 +142,7 @@ const transformPictoRow = (targets, options) => (row, next) => {
       );
       handleFileResult(results[0].obj.file, transformedRow, next);
     } else {
+      console.error(`Error: Couldn't find or guess any pictogram file for "${label}".`);
       next(null, transformedRow);
     }
   }

@@ -105,6 +105,7 @@ dist
 
 # csv import
 Interpretable - Donnees pictogrammes - Pictos.csv
+Interpretable - Donnees pictogrammes - Pictos avec rubriques.csv
 Interpretable - Donnees pictogrammes - Grilles.csv
 images/*
 export/

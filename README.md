@@ -1,6 +1,7 @@
-# import
+# Import pictograms to Interpretable AAC board
 
-Import pictograms data and files.
+Import SVG pictograms and associated data to Interpretable AAC board.
+> see https://github.com/interpretable/interpretable
 
 ## From Google drive
 
@@ -10,7 +11,7 @@ Import pictograms data and files.
 2. Copy both files to the `import` repository directory :
 
 - `./Interpretable - Donnees pictogrammes - Grilles.csv`
-- `./Interpretable - Donnees pictogrammes - Pictos.csv`
+- `./Interpretable - Donnees pictogrammes - Pictos avec rubriques.csv`
 
 3. Download last `svg` pictograms folder from **Google Drive** :
    https://drive.google.com/drive/folders/1hrppNScjbcCQPhfc2jesljYrUhXUE2w4
@@ -20,7 +21,7 @@ And extract it to the `images` directory.
 4. Run the script
 
 ```
-npm run csv-to-cboard
+npm run csv-to-cboard &> import.log
 ```
 
 ## Todo
