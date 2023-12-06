@@ -10,8 +10,8 @@ Import SVG pictograms and associated data to Interpretable AAC board.
 
 2. Copy both files to the `import` repository directory :
 
-- `./Interpretable - Donnees pictogrammes - Grilles.csv`
-- `./Interpretable - Donnees pictogrammes - Pictos avec rubriques.csv`
+- `./Interpretable - Donnees pictogrammes - cboard_grid.csv`
+- `./Interpretable - Donnees pictogrammes - cboard_data.csv`
 
 3. Download last `svg` pictograms folder from **Google Drive** :
    https://drive.google.com/drive/folders/1hrppNScjbcCQPhfc2jesljYrUhXUE2w4
@@ -23,6 +23,8 @@ And extract it to the `images` directory.
 ```
 npm run csv-to-cboard &> import.log
 ```
+
+5. Copy the content of the `./export` folder to the __Cboard project__.
 
 ## Resources
 

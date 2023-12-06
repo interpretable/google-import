@@ -11,12 +11,12 @@ simovSlugify.extend({ "'": ' ', '/': ' ' });
 const pathToBoardsSheet = path.resolve(
   __dirname,
   '..',
-  'Interpretable - Donnees pictogrammes - Grilles.csv'
+  'Interpretable - Donnees pictogrammes - cboard_grid.csv'
 );
 const pathToTilesSheet = path.resolve(
   __dirname,
   '..',
-  'Interpretable - Donnees pictogrammes - Pictos avec rubriques.csv'
+  'Interpretable - Donnees pictogrammes - cboard_data.csv'
 );
 const cboardJsonFileDirectory = path.resolve(
   __dirname,
@@ -66,14 +66,19 @@ const transformPictoToTile = picto => ({
   ...picto
 });
 
+const toBoardId = boardId => {
+  return boardId === 'racine' ? 'root' : boardId;
+};
+
 const transformBoardRow = row => {
   // Grilles
   // Nombre de ligne
   // Nombre de colonne
   const label = row['Grilles'];
+  const id = slugify(label);
 
   return {
-    id: slugify(label),
+    id: toBoardId(id),
     name: label,
     nameKey: label,
     author: 'Interpretable',
@@ -91,9 +96,11 @@ const transformPictoRow = (targets, options) => (row, next) => {
     ? slugify(humanize(row['Nom du fichier image']), '_')
     : null;
 
-  const label = row['Label*\r\n(Apparaitra sous le picto dans CBoard)'];
+  const label = row['Label*\n(Apparaitra sous le picto dans CBoard)'];
   if (!label) {
-    console.warn(`Pictogram with filename "${userInputFilename}" has no label.`);
+    console.warn(
+      `Pictogram with filename "${userInputFilename}" has no label.`
+    );
     next(null, null);
     return;
   }
@@ -107,11 +114,12 @@ const transformPictoRow = (targets, options) => (row, next) => {
 
   const normalizedLabel = label.toLowerCase().replaceAll('-', ' ');
   const loadBoard = row["Lors d'un clic ouvre la grille"];
-  const id = `${slugify(board)}_${slugify(label)}`;
+  const boardId = toBoardId(slugify(board));
+  const id = `${boardId}_${slugify(label)}`;
   console.log('id', id);
   transformedRow = {
-    board: slugify(board),
-    loadBoard: loadBoard ? slugify(loadBoard) : null,
+    board: boardId,
+    loadBoard: loadBoard ? toBoardId(slugify(loadBoard)) : null,
     row: row['Ligne'] || null,
     column: row['Colonne'] || null,
     id,
@@ -140,7 +148,9 @@ const transformPictoRow = (targets, options) => (row, next) => {
       );
       handleFileResult(results[0].obj.file, transformedRow, next);
     } else {
-      console.error(`Error: Couldn't find or guess any pictogram file for "${label}".`);
+      console.error(
+        `Error: Couldn't find or guess any pictogram file for "${label}".`
+      );
       next(null, transformedRow);
     }
   }

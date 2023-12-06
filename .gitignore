@@ -104,8 +104,7 @@ dist
 .tern-port
 
 # csv import
-Interpretable - Donnees pictogrammes - Pictos.csv
-Interpretable - Donnees pictogrammes - Pictos avec rubriques.csv
-Interpretable - Donnees pictogrammes - Grilles.csv
+Interpretable - Donnees pictogrammes - cboard_data.csv
+Interpretable - Donnees pictogrammes - cboard_grid.csv
 images/*
 export/
